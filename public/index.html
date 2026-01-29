@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shop</title>
+</head>
+<body>
+
+<h2>Add product</h2>
+<input id="name" placeholder="Name">
+<input id="category" placeholder="Category">
+<input id="price" placeholder="Price">
+<input id="stock" placeholder="Stock">
+
+<button onclick="addProduct()">Add</button>
+
+<h2>Search</h2>
+<input id="searchCategory" placeholder="Category">
+<input id="minPrice" placeholder="Min price">
+<input id="fields" placeholder="Fields (name,price)">
+<button onclick="search()">Show all</button>
+
+<div id="results"></div>
+
+<script>
+async function addProduct() {
+  const product = {
+    name: document.getElementById("name").value,
+    category: document.getElementById("category").value,
+    price: document.getElementById("price").value,
+    stock: document.getElementById("stock").value
+  };
+
+  console.log("SENDING:", product); // � смотри в консоль
+
+  await fetch("/api/products", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(product)
+  });
+
+  alert("✅ Product added");
+  search();
+}
+
+
+async function search() {
+  let url = "/api/products?sort=price";
+
+  if (searchCategory.value)
+    url += `&category=${searchCategory.value}`;
+  if (minPrice.value)
+    url += `&minPrice=${minPrice.value}`;
+  if (fields.value)
+    url += `&fields=${fields.value}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  console.log("FOUND:", data);
+
+  results.innerHTML = "";
+  data.forEach(p => {
+    results.innerHTML += `<pre>${JSON.stringify(p, null, 2)}</pre>`;
+  });
+}
+
+// load on start
+search();
+</script>
+
+</body>
+</html>
